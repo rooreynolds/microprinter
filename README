@@ -2,3 +2,9 @@ Microprinter Arduino library
 
 http://rooreynolds.com/category/microprinter/
 http://microprinter.pbworks.com/
+
+microprinter_sketch.pde - an arduino sketch
+Microprinter.java - a java class to communicate with the arduino
+Microprinter.rb - a ruby class to communicate with the arduino
+
+(Ben O'Steen has a Python port of the library at https://github.com/benosteen/microprinter/) 
