@@ -6,7 +6,7 @@ require 'cgi'
 require './Microprinter_debug.rb'
 # require './Microprinter.rb'
 
-set :arduinoport, "/dev/cu.usbserial-A1001NFW"
+set :arduinoport, "/dev/cu.usbmodem24131"
 
 before do
   @printer = Microprinter_debug.new(settings.arduinoport)
@@ -19,7 +19,7 @@ def print_and_cut(text) # utility method. print line (or array of lines) then fe
   feed_and_cut
 end
 
-def feed_and_cut # TODO: this should go into the microprinter librarby?
+def feed_and_cut # TODO: this should go into the microprinter library?
   @printer.feed
   @printer.cut
 end
@@ -53,7 +53,7 @@ end
 get '/print' do
   pass unless params[:text] # use this rule if 'text' param exists
   @text = params[:text]
-  print_and_cut [@text, request.url]
+  print_and_cut [@text, "", request.url]
   "Text: #{@text}"
 end
 
