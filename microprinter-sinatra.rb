@@ -11,7 +11,7 @@ set :arduinoport, "/dev/cu.usbmodem24131" # or whatever yours is.
 before do
   @printer = Microprinter_debug.new(settings.arduinoport)
   # @printer = Microprinter.new(settings.arduinoport)
-  @printer.set_print_mode_a
+  @printer.set_character_width_normal
 end
 
 # def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut

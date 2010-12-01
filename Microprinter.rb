@@ -30,12 +30,12 @@ class Microprinter
   # TODO: make print methods a bit clearer; e.g. 'set_print_mode_bold', 'set_print_mode_narrow'
 
   # Standard font: 42 characters per line if using 80mm paper
-  def set_print_mode_a
+  def set_character_width_normal
     set_print_mode 0;
   end
 
   # Narrow font, more characters per line
-  def set_print_mode_b
+  def set_character_width_narrow
     set_print_mode 1;
   end
 
@@ -91,7 +91,7 @@ class Microprinter
     @sp.flush
   end
 
-  def feed_and_cut # TODO: this should go into the microprinter library?
+  def feed_and_cut # utility method. 
     self.feed
     self.cut
   end
