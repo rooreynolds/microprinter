@@ -12,10 +12,10 @@ Contents
  - Microprinter.rb - a ruby class to communicate with the arduino  
  - Microprinter_debug.rb - ruby class which prints to console rather than printer  
  - microbroker-sinatra - sinatra app   
-     usage: `ruby -rubygems microprinter-sinatra.rb`  
-       `http://localhost:4567/print/weather`  
-       `http://localhost:4567/print?text=test text`  
-       `http://localhost:4567/print?feed=http://rooreynolds.com/feed/`  
+   usage: `ruby -rubygems microprinter-sinatra.rb`  
+  `http://localhost:4567/print/weather`  
+  `http://localhost:4567/print?text=test text`  
+  `http://localhost:4567/print?feed=http://rooreynolds.com/feed/`  
 
 Elsewhere: 
 ---------
