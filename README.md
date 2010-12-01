@@ -28,6 +28,7 @@ TODO
 
 In no particular order, some things to be done:
 
+-   add code to manage `/print?url=http://url.com`  
 -   check RSS feeds and print new items as they appear  
     Examples: twitter, latest links on pinboard.in, latest instapaper items…
 -   make URL for weather reports configurable so it's not hard coded to south of england (!)
@@ -35,3 +36,13 @@ In no particular order, some things to be done:
 -   re-integrate debug library into microprinter.rb - pipe serial messages to console for debugging and automated testing. 
 -   format the RSS feed item printout to shorten the URL and print properly so that it can be OCR'd with Google Goggles
 -   possibly port Ben O'Steen's image stuff so that you can print QRCodes on links, as well as images. 
+-   barcodes, 1D (built-in capability)
+
+### Also, I want a pony
+
+Some todo items that may or may not end up being useful, feasible, interesting, or just plain dumb.
+
+-   make `/` do something useful, like display a form that you can feed printable items into. 
+-   add some kind of polling behavior for specified feeds
+-   integrate tom taylor's microprinter-over-ethernet-shield setup, so you can use this sinatra app with one or the other? 
+-   bookmarklet for printing locally
