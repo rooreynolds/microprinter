@@ -3,10 +3,10 @@ require 'sinatra'
 require 'rss'
 require 'open-uri'
 require 'cgi'
-require './Microprinter_debug.rb'
-# require './Microprinter.rb'
+require './Microprinter_debug.rb' # uncomment this to print to the console instead of the printer. 
+# require './Microprinter.rb' 
 
-set :arduinoport, "/dev/cu.usbmodem24131"
+set :arduinoport, "/dev/cu.usbmodem24131" # or whatever yours is. 
 
 before do
   @printer = Microprinter_debug.new(settings.arduinoport)
@@ -14,15 +14,15 @@ before do
   @printer.set_print_mode_a
 end
 
-def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
-  @printer.print_text(text)
-  feed_and_cut
-end
+# def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
+#   @printer.print_text(text)
+#   feed_and_cut
+# end
 
-def feed_and_cut # TODO: this should go into the microprinter library?
-  @printer.feed
-  @printer.cut
-end
+# def feed_and_cut # TODO: this should go into the microprinter library?
+#   @printer.feed
+#   @printer.cut
+# end
 
 def cleanHTML(text)
   # nb could use htmlentities library to unencode HTML entities, but how to deal with non-ascii characters? Need to turn unicode chars to plain text somehow 

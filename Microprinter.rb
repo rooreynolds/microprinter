@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'serialport'
 
+
+
 class Microprinter 
 
   COMMAND = 0x1B
@@ -25,10 +27,14 @@ class Microprinter
     @sp.close              
   end 
 
+  # TODO: make print methods a bit clearer; e.g. 'set_print_mode_bold', 'set_print_mode_narrow'
+
+  # Standard font: 42 characters per line if using 80mm paper
   def set_print_mode_a
     set_print_mode 0;
   end
 
+  # Narrow font, more characters per line
   def set_print_mode_b
     set_print_mode 1;
   end
@@ -39,11 +45,13 @@ class Microprinter
     @sp.putc i
     @sp.flush
   end
-
+  
+  # Bold weight text
   def set_double_print_on 
     set_double_print(0x01)
   end
 
+  # Normal weight text
   def set_double_print_off
     set_double_print(0x00)
   end
@@ -81,6 +89,16 @@ class Microprinter
   def print(text)
     @sp.print(text)
     @sp.flush
+  end
+
+  def feed_and_cut # TODO: this should go into the microprinter library?
+    self.feed
+    self.cut
+  end
+  
+  def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
+    self.print_text(text)
+    self.feed_and_cut
   end
 
   def feed() 

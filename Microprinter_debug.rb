@@ -1,3 +1,5 @@
+# TODO: turn this debug library into an rspec mock/stub
+
 class Microprinter_debug
   def initialize(port_str)
     puts "[Microprinter init]" 
@@ -24,6 +26,16 @@ class Microprinter_debug
 
   def cut
     puts "[-----FULL CUT-----]"
+  end
+  
+  def feed_and_cut
+    self.feed
+    self.cut
+  end
+  
+  def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
+    self.print_text(text)
+    self.feed_and_cut
   end
 
   def partial_cut
