@@ -46,14 +46,14 @@ get '/print/weather' do
   open(@weatherurl) do |f|
     weather_content = f.read
   end
-  print_and_cut weather_content.split("\n")
+  @printer.print_and_cut weather_content.split("\n")
   "Weather printed"
 end
 
 get '/print' do
   pass unless params[:text] # use this rule if 'text' param exists
   @text = params[:text]
-  print_and_cut [@text, "", request.url]
+  @printer.print_and_cut [@text, "", request.url]
   "Text: #{@text}"
 end
 
@@ -76,19 +76,19 @@ get '/print' do
   # rss.channel.description
 
   @printer.print_text ["#{rss.channel.title} (#{rss.channel.link})"]
-  @printer.set_double_print_on
+  @printer.set_font_weight_bold
   puts rss.items[0].title
   puts cleanHTML(rss.items[0].title)
   @printer.print_text [cleanHTML(rss.items[0].title)]
-  @printer.set_double_print_off
-  @printer.set_print_mode_b
+  @printer.set_font_weight_normal
+  @printer.set_character_width_narrow
   @printer.print_text [cleanHTML(rss.items[0].description)]
   @printer.set_underline_on
   @printer.print_text [rss.items[0].link]
   @printer.set_underline_off
   @printer.print_text [rss.items[0].date.strftime("%B %d, %Y")]
-  @printer.set_print_mode_a
-  feed_and_cut
+  @printer.set_character_width_normal
+  @printer.feed_and_cut
   "Feed: #{@feed}"
 end
 

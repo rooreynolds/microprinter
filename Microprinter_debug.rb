@@ -1,4 +1,4 @@
-# TODO: turn this debug library into an rspec mock/stub
+# TODO: turn this debug library into an rspec mock/stub; when testing, send serial data to a stub, so that we can test for expected responses, etc. 
 
 class Microprinter_debug
   def initialize(port_str)
@@ -28,6 +28,10 @@ class Microprinter_debug
     puts "[-----FULL CUT-----]"
   end
   
+  def partial_cut
+    puts "[-----PARTIAL CUT-----]"
+  end  
+
   def feed_and_cut
     self.feed
     self.cut
@@ -38,24 +42,37 @@ class Microprinter_debug
     self.feed_and_cut
   end
 
-  def partial_cut
-    puts "[-----PARTIAL CUT-----]"
-  end  
+  def set_character_width_normal
+    puts "[set print mode a (normal width text)]"
+  end
+
+  def set_character_width_narrow
+    puts "[set print mode b (narrow width text)]"
+  end
 
   def set_print_mode_a
-    puts "[set print mode a]"
+    set_character_width_normal
   end
 
   def set_print_mode_b
-    puts "[set print mode b]"
+    set_character_width_narrow
+  end
+
+  
+  def set_font_weight_bold 
+    puts "[set double print on (bold text)]"
   end
   
   def set_double_print_on 
-    puts "[set double print on]"
+    set_font_weight_bold
+  end
+  
+  def set_font_weight_normal
+    puts "[set double print off (normal weight text)]"
   end
   
   def set_double_print_off 
-    puts "[set double print off]"
+    set_font_weight_normal
   end
   
   def set_underline_on 
