@@ -25,10 +25,7 @@ class Microprinter
     @sp.close
   end 
 
-  # TODO: make print methods a bit clearer; e.g. 'set_print_mode_bold', 'set_print_mode_narrow'
-
-  # Standard font: 42 characters per line if using 80mm paper
-  
+  # Standard font: 42 characters per line if using 80mm paper  
   def set_character_width_normal
     set_print_mode 0;
   end
@@ -101,6 +98,7 @@ class Microprinter
 
 
   # Feed this method either a string or an array of strings; each will be printed on its own line.
+  # TODO: should be able to feed this method a long string with line endings, and have it print properly, the same way you can feed `erb` or `haml` a set of lines in sinatra. 
   def print_text(text)
     text.each do |line|
       print("#{line}\n")

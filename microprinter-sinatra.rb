@@ -14,16 +14,6 @@ before do
   @printer.set_character_width_normal
 end
 
-# def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
-#   @printer.print_text(text)
-#   feed_and_cut
-# end
-
-# def feed_and_cut # TODO: this should go into the microprinter library?
-#   @printer.feed
-#   @printer.cut
-# end
-
 def cleanHTML(text)
   # nb could use htmlentities library to unencode HTML entities, but how to deal with non-ascii characters? Need to turn unicode chars to plain text somehow 
   newtext = text
@@ -61,6 +51,24 @@ get '/print' do
   pass unless params[:url] # use this rule if 'url' param exists
   @url = params[:url]
   #TODO: do some processing...
+
+  #TODO: maybe use a regex to identify URLs, rather than explicity ask for a ?url= param? 
+  # Something like this, from http://daringfireball.net/2010/07/improved_regex_for_matching_urls
+  # (?i)\b((?:[a-z][\w-]+:(?:/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))
+
+  # From sinatra readme (http://www.sinatrarb.com/intro.html)
+  # Route matching with Regular Expressions:
+
+  #   get %r{/hello/([\w]+)} do
+  #     "Hello, #{params[:captures].first}!"
+  #   end
+
+  # Or with a block parameter:
+  # 
+  #   get %r{/hello/([\w]+)} do |c|
+  #     "Hello, #{c}!"
+  #   end
+
   "Url: #{@url}"
 end
 
@@ -100,3 +108,6 @@ get '/' do
   "try /print"
 end
 
+get '/linkformat' do
+  
+end
