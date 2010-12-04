@@ -41,6 +41,15 @@ get '/print/weather' do
   "Weather printed"
 end
 
+get '/print/barcode' do
+  @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
+  @printer.set_barcode_height(45)
+  @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
+  @printer.print_barcode("/2009/02/22/")
+  @printer.feed_and_cut
+  "Printed sample barcode"
+end
+
 get '/print/barcode/:barcode' do
   @printer.set_barcode_height(params[:height]) if params[:height] 
   case params[:width] 
@@ -72,13 +81,6 @@ get '/print/barcode/:barcode' do
   end
   @printer.feed_and_cut
   "Printed barcode #{params[:barcode]}"
-end
-
-get '/print/barcode2' do
-  @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
-  @printer.set_barcode_height(45)
-  @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
-  @printer.print_barcode("/2009/02/22/")
 end
 
 get '/print' do
