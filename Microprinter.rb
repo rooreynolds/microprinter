@@ -10,6 +10,31 @@ class Microprinter
   DOUBLEPRINT = 0x47
   UNDERLINE = 0x2D
 
+  COMMAND_BARCODE = 0x1D
+  COMMAND_BARCODE_PRINT = 0x6B
+  COMMAND_BARCODE_WIDTH = 0x77
+  COMMAND_BARCODE_HEIGHT = 0x68
+  COMMAND_BARCODE_TEXTPOSITION = 0x48
+  COMMAND_BARCODE_FONT = 0x66
+
+  BARCODE_WIDTH_NARROW = 0x02
+  BARCODE_WIDTH_MEDIUM = 0x03
+  BARCODE_WIDTH_WIDE = 0x04
+
+  BARCODE_TEXT_NONE = 0x00
+  BARCODE_TEXT_ABOVE = 0x01
+  BARCODE_TEXT_BELOW = 0x02
+  BARCODE_TEXT_BOTH = 0x03
+
+  BARCODE_MODE_UPCA = 0x00
+  BARCODE_MODE_UPCE = 0x01
+  BARCODE_MODE_JAN13AEN = 0x02
+  BARCODE_MODE_JAN8EAN = 0x03
+  BARCODE_MODE_CODE39 = 0x04
+  BARCODE_MODE_ITF = 0x05
+  BARCODE_MODE_CODEABAR = 0x06
+  BARCODE_MODE_CODE128 = 0x07
+
   def initialize(port_str = "/dev/cu.usbserial-A1001NFW")  
     @port_str = port_str 
     baud_rate = 9600
@@ -137,6 +162,39 @@ class Microprinter
   def partial_cut()
     @sp.putc COMMAND
     @sp.putc PARTIALCUT
+    @sp.flush
+  end
+
+  def print_barcode(barcode_mode = BARCODE_MODE_CODE39, barcode)
+    @sp.putc COMMAND_BARCODE
+    @sp.putc COMMAND_BARCODE_PRINT
+    @sp.putc barcode_mode 
+    @sp.print barcode
+    @sp.putc 0x00
+    @sp.flush
+  end
+
+  def set_barcode_height(height) # in dots. default = 162
+    height = 0 if (height.to_i < 0)
+    @sp.putc COMMAND_BARCODE
+    @sp.putc COMMAND_BARCODE_HEIGHT
+    @sp.putc height.to_i 
+    @sp.flush
+  end
+
+  def set_barcode_width(width) 
+    @sp.putc COMMAND_BARCODE
+    @sp.putc COMMAND_BARCODE_WIDTH
+    @sp.putc width
+    @sp.flush
+  end
+
+  def set_barcode_text_position(position) 
+    position = 0 if (position.to_i < 0)
+    position = 3 if (position.to_i > 3)
+    @sp.putc COMMAND_BARCODE 
+    @sp.putc COMMAND_BARCODE_TEXTPOSITION
+    @sp.putc position 
     @sp.flush
   end
 

@@ -1,6 +1,16 @@
 # TODO: turn this debug library into an rspec mock/stub; when testing, send serial data to a stub, so that we can test for expected responses, etc. 
 
 class Microprinter_debug
+
+  BARCODE_MODE_UPCA = 0x00
+  BARCODE_MODE_UPCE = 0x01
+  BARCODE_MODE_JAN13AEN = 0x02
+  BARCODE_MODE_JAN8EAN = 0x03
+  BARCODE_MODE_CODE39 = 0x04
+  BARCODE_MODE_ITF = 0x05
+  BARCODE_MODE_CODEABAR = 0x06
+  BARCODE_MODE_CODE128 = 0x07
+
   def initialize(port_str)
     puts "[Microprinter init]" 
   end
@@ -82,8 +92,24 @@ class Microprinter_debug
   def set_underline_off 
     puts "[set underline off]"
   end
-  
+ 
+  def print_barcode(barcode_mode = BARCODE_MODE_CODE39, barcode)
+    puts "[barcode] ||||| #{barcode} (mode #{barcode_mode})"
+  end
 
+  def set_barcode_height(height) # in dots. default = 162
+    puts "[set barcode height = #{height}]"
+  end
+
+  def set_barcode_width(width) # 2, 3 or 4. default = 3
+    puts "[set barcode width = #{width}]"
+  end
+  
+  def set_barcode_text_position(position) # 0-3
+    puts "[set barcode text position = #{position}]"
+  end
+  
+  
 end 
 
 

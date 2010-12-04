@@ -3,14 +3,15 @@ require 'sinatra'
 require 'rss'
 require 'open-uri'
 require 'cgi'
-require './Microprinter_debug.rb' # uncomment this to print to the console instead of the printer. 
-# require './Microprinter.rb' 
+# require './Microprinter_debug.rb' # uncomment this to print to the console instead of the printer. 
+require './Microprinter.rb' 
 
-set :arduinoport, "/dev/cu.usbmodem24131" # or whatever yours is. 
+set :arduinoport, "/dev/cu.usbserial-A1001NFW" # or whatever yours is. 
+# set :arduinoport, "/dev/cu.usbmodem24131" # or whatever yours is. 
 
 before do
-  @printer = Microprinter_debug.new(settings.arduinoport)
-  # @printer = Microprinter.new(settings.arduinoport)
+#  @printer = Microprinter_debug.new(settings.arduinoport)
+  @printer = Microprinter.new(settings.arduinoport)
   @printer.set_character_width_normal
 end
 
@@ -38,6 +39,46 @@ get '/print/weather' do
   end
   @printer.print_and_cut weather_content.split("\n")
   "Weather printed"
+end
+
+get '/print/barcode/:barcode' do
+  @printer.set_barcode_height(params[:height]) if params[:height] 
+  case params[:width] 
+    when "narrow" then @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_NARROW)
+    when "medium" then @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
+    when "wide" then @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_WIDE)
+  end
+
+  case params[:position] 
+    when "below" then @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
+    when "above" then @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_ABOVE)
+    when "both" then @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BOTH)
+    when "none" then @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_NONE)
+  end
+
+  if params[:mode]
+    case params[:mode]
+      when "upca" then @printer.print_barcode(Microprinter::BARCODE_MODE_UPCA, params[:barcode])
+      when "upce" then @printer.print_barcode(Microprinter::BARCODE_MODE_UPCE, params[:barcode])
+      when "jan13aen" then @printer.print_barcode(Microprinter::BARCODE_MODE_JAN13AEN, params[:barcode])
+      when "jan8ean" then @printer.print_barcode(Microprinter::BARCODE_MODE_JAN8EAN, params[:barcode])
+      when "code39" then @printer.print_barcode(Microprinter::BARCODE_MODE_CODE39, params[:barcode])
+      when "itf" then @printer.print_barcode(Microprinter::BARCODE_MODE_ITF, params[:barcode])
+      when "codeabar" then @printer.print_barcode(Microprinter::BARCODE_MODE_CODEABAR, params[:barcode])
+      when "code128" then @printer.print_barcode(Microprinter::BARCODE_MODE_CODE128, params[:barcode])
+    end
+  else 
+    @printer.print_barcode(params[:barcode])
+  end
+  @printer.feed_and_cut
+  "Printed barcode #{params[:barcode]}"
+end
+
+get '/print/barcode2' do
+  @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
+  @printer.set_barcode_height(45)
+  @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
+  @printer.print_barcode("/2009/02/22/")
 end
 
 get '/print' do
@@ -80,13 +121,9 @@ get '/print' do
     rss_content = f.read
   end
   rss = RSS::Parser.parse(rss_content, false)
-  # rss.items.size
-  # rss.channel.description
-
+  # useful: rss.items.size, rss.channel.description, ...
   @printer.print_text ["#{rss.channel.title} (#{rss.channel.link})"]
   @printer.set_font_weight_bold
-  puts rss.items[0].title
-  puts cleanHTML(rss.items[0].title)
   @printer.print_text [cleanHTML(rss.items[0].title)]
   @printer.set_font_weight_normal
   @printer.set_character_width_narrow
@@ -97,7 +134,7 @@ get '/print' do
   @printer.print_text [rss.items[0].date.strftime("%B %d, %Y")]
   @printer.set_character_width_normal
   @printer.feed_and_cut
-  "Feed: #{@feed}"
+  "Printed first item from feed: #{@feed}"
 end
 
 get '/print' do
