@@ -108,6 +108,19 @@ class Microprinter_debug
   def set_barcode_text_position(position) # 0-3
     puts "[set barcode text position = #{position}]"
   end
+
+
+  def set_linefeed_rate(rate) #def = 22
+    puts "[set linefeed rate = #{rate}]"
+  end
+
+  def print_image_row(data)
+    puts "[print image row]"
+  end
+
+  def print_image_bytes(mode, data)
+    puts "[print image bytes]"
+  end
   
   
 end 
