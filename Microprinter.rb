@@ -209,24 +209,15 @@ class Microprinter
     @sp.flush
   end
 
-  def print_image_row(data) 
-    mode = 0
-    bytes = Array.new
-    for x in (0..data[0].length - 1) 
-      byte_column = data[0][x] << 7|data[1][x] << 6|data[2][x] << 5|data[3][x] << 4|data[4][x] << 3|data[5][x] << 2|data[6][x] << 1|data[7][x]
-      bytes.push(byte_column ^ 255)
-    end
-    print_image_bytes(mode, bytes)
-  end
-
-  def print_image_bytes(mode, data) #currently supports mode 0, 1 (20&21 coming soon)
-    mode = 0 if (mode.to_i < 0)
-    mode = 1 if (mode.to_i > 1)
+  def print_image_bytes(mode, data) # mode = 0, 1, 20, 21
+    density = 1
+    density = 3 if mode == 1 or mode == 20
+    datalength = data.length / density
     @sp.putc COMMAND
     @sp.putc COMMAND_IMAGE
     @sp.putc mode 
-    @sp.putc data.length%256
-    @sp.putc data.length/256
+    @sp.putc datalength%256
+    @sp.putc datalength/256
     data.each do |x|
       @sp.putc x 
     end
