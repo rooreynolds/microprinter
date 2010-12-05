@@ -211,7 +211,7 @@ class Microprinter
 
   def print_image_bytes(mode, data) # mode = 0, 1, 20, 21
     density = 1
-    density = 3 if mode == 1 or mode == 20
+    density = 3 if (mode > 1) 
     datalength = data.length / density
     @sp.putc COMMAND
     @sp.putc COMMAND_IMAGE
