@@ -169,7 +169,7 @@ class Microprinter
     @sp.flush
   end
 
-  def print_barcode(barcode_mode = BARCODE_MODE_CODE39, barcode)
+  def print_barcode(barcode, barcode_mode = BARCODE_MODE_CODE39)
     @sp.putc COMMAND_BARCODE
     @sp.putc COMMAND_BARCODE_PRINT
     @sp.putc barcode_mode 
