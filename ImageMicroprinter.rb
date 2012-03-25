@@ -74,7 +74,6 @@ class ImageMicroprinter < Microprinter
       if lbuffer.length == rowlimit
         ###puts (lbuffer.to_s)
         print_image_row(mode, lbuffer)
-        sleep(0.2)
         lbuffer = Array.new
       end
     end
@@ -114,5 +113,4 @@ class ImageMicroprinter < Microprinter
     end
     print_image_bytes(mode, bytes)
   end
-
 end

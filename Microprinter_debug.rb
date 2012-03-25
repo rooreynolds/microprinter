@@ -93,7 +93,7 @@ class Microprinter_debug
     puts "[set underline off]"
   end
  
-  def print_barcode(barcode_mode = BARCODE_MODE_CODE39, barcode)
+  def print_barcode(barcode_mode, barcode)
     puts "[barcode] ||||| #{barcode} (mode #{barcode_mode})"
   end
 

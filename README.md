@@ -39,7 +39,7 @@ In no particular order, some things to be done:
 
 ### Also, I want a pony
 
-Some todo items that may or may not end up being useful, feasible, interesting, or just plain dumb.
+Some todo items that may or may not end up being useful, feasible or even interesting.
 
 -   make `/` do something useful, like display a form that you can feed printable items into. 
 -   add some kind of polling behavior for specified feeds

@@ -56,16 +56,18 @@ class Microprinter
 
   # Standard font: 42 characters per line if using 80mm paper  
   def set_character_width_normal
-    set_print_mode 0;
+    set_print_mode 0
+    set_linefeed_rate 55
+  end
+
+  # Narrow font, more characters per line
+  def set_character_width_narrow
+    set_print_mode 1
+    set_linefeed_rate 40
   end
 
   def set_print_mode_a
     set_character_width_normal
-  end
-  
-  # Narrow font, more characters per line
-  def set_character_width_narrow
-    set_print_mode 1;
   end
 
   def set_print_mode_b
@@ -88,7 +90,7 @@ class Microprinter
   # Maintain backwards compatibility...
   def set_font_weight_bold
     # set_double_print_on
-    set_double_print(0x01)     
+    set_double_print(0x01)
   end
 
   # Normal weight text
@@ -108,6 +110,7 @@ class Microprinter
     @sp.putc DOUBLEPRINT 
     @sp.putc i
     @sp.flush
+    sleep (0.01)
   end 
 
   def set_underline_on 
@@ -123,6 +126,7 @@ class Microprinter
     @sp.putc UNDERLINE
     @sp.putc i
     @sp.flush
+    sleep (0.01)
   end
 
 
@@ -131,22 +135,24 @@ class Microprinter
   def print_text(text)
     text.each do |line|
       print("#{line}\n")
+      sleep (0.1)
     end
   end
  
   def print(text)
     @sp.print(text)
     @sp.flush
+    sleep (0.01)
   end
 
   def feed_and_cut # utility method. 
-    self.feed
-    self.cut
+    feed
+    cut
   end
   
   def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
-    self.print_text(text)
-    self.feed_and_cut
+    print_text(text)
+    feed_and_cut
   end
 
   def feed() 
@@ -155,12 +161,14 @@ class Microprinter
     @sp.print("\n")
     @sp.print("\n")
     @sp.flush
+    sleep (0.01)
   end
 
   def cut()
     @sp.putc COMMAND
     @sp.putc FULLCUT
     @sp.flush
+    sleep (0.01)
   end
 
   def partial_cut()
@@ -176,6 +184,7 @@ class Microprinter
     @sp.print barcode
     @sp.putc 0x00
     @sp.flush
+    sleep (0.01)
   end
 
   def set_barcode_height(height) # in dots. default = 162
@@ -184,6 +193,7 @@ class Microprinter
     @sp.putc COMMAND_BARCODE_HEIGHT
     @sp.putc height.to_i 
     @sp.flush
+    sleep (0.01)
   end
 
   def set_barcode_width(width) 
@@ -191,6 +201,7 @@ class Microprinter
     @sp.putc COMMAND_BARCODE_WIDTH
     @sp.putc width
     @sp.flush
+    sleep (0.01)
   end
 
   def set_barcode_text_position(position) 
@@ -200,6 +211,7 @@ class Microprinter
     @sp.putc COMMAND_BARCODE_TEXTPOSITION
     @sp.putc position 
     @sp.flush
+    sleep (0.01)
   end
   
   def set_linefeed_rate(rate) #def = 22
@@ -207,6 +219,7 @@ class Microprinter
     @sp.putc FEED_RATE 
     @sp.putc rate 
     @sp.flush
+    sleep (0.01)
   end
 
   def print_image_bytes(mode, data) # mode = 0, 1, 20, 21
@@ -220,8 +233,12 @@ class Microprinter
     @sp.putc datalength/256
     data.each do |x|
       @sp.putc x 
+      @sp.flush
+      sleep (0.005)
     end
     @sp.flush
-  end 
+    sleep (0.1)
+  end
+
 end 
 
