@@ -1,22 +1,23 @@
 require 'rubygems'
 require 'sinatra'
+require 'sinatra/config_file'
 require 'rss'
 require 'open-uri'
 require 'cgi'
-
 require 'sqlite3'
 require 'hpricot'
 require 'open-uri'
 
-#require './Microprinter_debug.rb' # uncomment this to print to the console instead of the printer. 
-require './Microprinter.rb' 
-
-set :arduinoport, "/dev/cu.usbserial-A1001NFW" # or whatever yours is. 
-#set :arduinoport, "/dev/cu.usbmodem24131" # or whatever yours is. 
+config_file 'settings.yml'
 
 before do
-  #@printer = Microprinter_debug.new(settings.arduinoport)
-  @printer = Microprinter.new(settings.arduinoport)
+  if (settings.debug)
+    require './Microprinter_debug.rb'
+    @printer = Microprinter_debug.new(settings.arduinoport)
+  else
+    require './Microprinter.rb' 
+    @printer = Microprinter.new(settings.arduinoport)
+  end
   @printer.set_character_width_normal
 end
 
@@ -64,11 +65,11 @@ end
 
 def printWeather (narrow = false)
   @printer.set_double_print_on
-  @printer.print_text "Weather - Southampton"
+  @printer.print_text "Weather - " + settings.weather['location']
   @printer.set_double_print_off
   @printer.set_character_width_narrow if (narrow)
   
-  @feed = "http://open.live.bbc.co.uk/weather/feeds/en/2637487/3dayforecast.rss"
+  @feed = settings.weather['feed']  # remove "http://open.live.bbc.co.uk/weather/feeds/en/2637487/3dayforecast.rss"
   rss_content = ""
   open(@feed) do |f|
     rss_content = f.read
@@ -89,13 +90,13 @@ def printWeather (narrow = false)
   end
   @printer.print_text [cleanHTML(text)]
 
-  doc = Hpricot(open('http://www.bbc.co.uk/weather/2637487').read) # https://github.com/hpricot/hpricot/wiki/hpricot-basics
+  doc = Hpricot(open(settings.weather['page']).read) # remove 'http://www.bbc.co.uk/weather/2637487'
   @printer.set_double_print_on
   @printer.print_text((doc/"//div[@class='title']")[0].innerHTML)
   @printer.set_double_print_off
   @printer.print_text((doc/"//div[@class='body']")[0].innerHTML)
   @printer.set_double_print_on
-  if ((doc/"//div[@class='title']")[1].innerHTML) 
+  if ((doc/"//div[@class='title']")[1]) 
     @printer.print_text((doc/"//div[@class='title']")[1].innerHTML)
     @printer.set_double_print_off
     @printer.print_text((doc/"//div[@class='body']")[1].innerHTML)
@@ -110,7 +111,9 @@ def printWeather (narrow = false)
 end
 
 def printThings(narrow = false)
-  db = SQLite3::Database.new("/Users/rooreynolds/Library/Application Support/Cultured Code/Things beta/ThingsLibrary.db")
+  thingsdb = "/Users/" + `whoami`.strip + "/" + settings.thingssqlitedb
+  p thingsdb
+  db = SQLite3::Database.new(thingsdb)  # TODO: remove "/Users/rooreynolds/Library/Application Support/Cultured Code/Things beta/ThingsLibrary.db"
   db.results_as_hash = true
   printList(db, "Actions - Review", "select ZTHING.ZTITLE as title, " \
     "date(ZTHING.ZSTARTDATE, 'unixepoch', '+31 years', 'localtime') as startdate, " \
@@ -174,7 +177,49 @@ def printTrains(narrow = false)
   @printer.set_character_width_normal if (narrow)
 
   #TODO: take a look at http://www.tfl.gov.uk/tfl/livetravelnews/realtime/tube/default.html#
+end
 
+def printCalendar(narrow = false) 
+  @printer.set_double_print_on
+  @printer.print_text "Calendar"
+  @printer.set_double_print_off
+
+  @printer.set_character_width_narrow if (narrow)
+  
+  url = settings.googlecalendar # TODO remove 'https://www.google.com/calendar/feeds/roo.reynolds%40digital.cabinet-office.gov.uk/private-ef8146bf0bee5149c2748a89078badc6/basic'
+  # get all future events, ordered by start time
+  url = url + "?singleevents=true&orderby=starttime&sortorder=ascending"
+  # actually, just get today's events
+  today = Date.today.strftime('%Y-%m-%dT%H:%M:%S')
+  tomorrow = (Date.today+1).strftime('%Y-%m-%dT%H:%M:%S')
+  url = url + '&start-min=' + today
+  url = url + '&start-max=' + tomorrow
+
+  xml_data = ""
+  open(url) do |f|
+    xml_data = f.read
+  end
+  doc = REXML::Document.new(xml_data)
+  titles = []
+  content = []
+  shortdate = []
+  location = []
+  doc.elements.each('feed/entry/title'){ |e| titles << e.text }
+  doc.elements.each('feed/entry/content'){ |e| content << e.text }
+  doc.elements.each('feed/entry/content'){ |e| shortdate << e.text.split("\n").first.slice(22..35).gsub(" to ", "-")}
+  doc.elements.each('feed/entry/content'){ |e| location << e.text.split("\n").find_all {|i| i.include?("Where: ")}}
+
+  titles.each_with_index do |title, idx|
+    line = (shortdate[idx] + " " + title)[0, (narrow ? 64 : 48)]
+    @printer.print_text line
+    if (location[idx].first) 
+      line2 = ("            (" + location[idx].first.slice(13..-1) + ")")[0, (narrow ? 64 : 48)]
+      @printer.print_text line2
+    end
+  end
+
+  @printer.set_character_width_normal if (narrow)
+  @printer.print "\n"
 end
 
 get '/print/cut' do
@@ -298,21 +343,28 @@ get '/print/weather' do
   printWeather  
 end
 
+get '/print/calendar' do
+  "printing calendar"
+  printCalendar
+end
+
 get '/print/dailydump' do
   @printer.set_character_width_normal
-  narrow = true
+  narrow = settings.narrow
   printDate
   printWeather(narrow)
   printTrains(narrow)
+  printCalendar(narrow)
   printThings(narrow)
 end
 
 get '/print/todo' do
-  printThings
+  printThings settings.narrow
 end
 
 get '/print/trains' do
   printTrains
 end
 
+# https://github.com/hpricot/hpricot/wiki/hpricot-basics
 #http://localhost:4567/print?feed=http://open.live.bbc.co.uk/weather/feeds/en/2637487/3dayforecast.rss

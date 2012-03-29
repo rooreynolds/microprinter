@@ -1,25 +1,26 @@
-# Example
-# 
-# require "sinatra"
-# require "sinatra/config_file"
-# 
-# configure do
-#   set :foo, "bar"
-#   config_file "settings.yml"                 # general settings
-#   config_file "#{environment}.settings.yml"  # environment specific settings
-#   foo # => "bar" (no matter what you put in your config file)
-# end
-# Now you could write in your settings.yml:
-# 
-# ---
 # server: [thin, webrick] # use only thin or webrick for #run!
-# public: /var/www        # load public files from /var/www
-# port:   8080            # run on port 8080
-# foo: baz
-# database:
-#   adapter: sqlite
-# In you development.settings.yml:
-# 
-# database:
-#   db_file: development.db
+# port:   8080            # run on port 8080 (defaults to 4567)
 
+arduinoport:     /dev/cu.usbserial-A1001NFW
+                 # or /dev/cu.usbmodem24131 or whatever yours is. 
+
+googlecalendar:  https://www.google.com/calendar/feeds/xxxxxxxxxxxx/private-xxxxxxxxxxxxxxxxxxxx/basic 
+                 # get your own private calendar XML feed this via https://www.google.com/calendar/
+
+weather:
+  location:      Southampton
+  feed:          http://open.live.bbc.co.uk/weather/feeds/en/2637487/3dayforecast.rss
+  page:          http://www.bbc.co.uk/weather/2637487
+
+train:
+  departures:    http://ojp.nationalrail.co.uk/service/ldbboard/dep/SOA/WAT/To
+  journeycheck:  http://www.journeycheck.southwesttrains.co.uk/southwesttrains/route?from=SOA&to=WAT&action=search
+
+thingssqlitedb:  Library/Application Support/Cultured Code/Things beta/ThingsLibrary.db 
+                 # shouldn't need to change this. Will be prepended with "/Users/" + `whoami` + "/"
+
+narrow:          true
+                 # narrow format (more chars per line)
+
+debug:           false
+                 # print to screen instead of actual printer
