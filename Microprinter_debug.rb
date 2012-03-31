@@ -11,7 +11,7 @@ class Microprinter_debug
   BARCODE_MODE_CODEABAR = 0x06
   BARCODE_MODE_CODE128 = 0x07
 
-  def initialize(port_str)
+  def initialize(port_str = "")
     puts "[Microprinter init]" 
   end
 
@@ -20,14 +20,18 @@ class Microprinter_debug
   end
 
   # Feed this method either a string or an array of strings; each will be printed on its own line.
-  def print_text(text)
-    text.each do |line|
-      print("[print]#{line}\n")
-    end
-  end
+  #def print_text(text)
+  #  text.each do |line|
+  #    print("[print]#{line}\n")
+  #  end
+  #end
 
   def print(text)
     puts text
+  end
+
+  def print_line(text)
+    puts("#{text}\n")
   end
 
   def feed 
@@ -48,7 +52,7 @@ class Microprinter_debug
   end
   
   def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
-    self.print_text(text)
+    self.print_line(text)
     self.feed_and_cut
   end
 
@@ -122,7 +126,4 @@ class Microprinter_debug
     puts "[print image bytes]"
   end
   
-  
-end 
-
-
+end

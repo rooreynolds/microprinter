@@ -129,15 +129,18 @@ class Microprinter
     sleep (0.01)
   end
 
+  def print_line(text)
+    @sp.print("#{text}\n")
+    sleep (0.3)
+  end
 
   # Feed this method either a string or an array of strings; each will be printed on its own line.
   # TODO: should be able to feed this method a long string with line endings, and have it print properly, the same way you can feed `erb` or `haml` a set of lines in sinatra. 
-  def print_text(text)
-    text.each do |line|
-      print("#{line}\n")
-      sleep (0.1)
-    end
-  end
+  #def print_text(text)
+  #  text.each do |line|
+  #    print_line(line)
+  #  end
+  #end
  
   def print(text)
     @sp.print(text)
@@ -146,12 +149,13 @@ class Microprinter
   end
 
   def feed_and_cut # utility method. 
+    set_linefeed_rate 55
     feed
     cut
   end
   
   def print_and_cut(text) # utility method. print line (or array of lines) then feed & cut
-    print_text(text)
+    print_line(text)
     feed_and_cut
   end
 
@@ -214,7 +218,7 @@ class Microprinter
     sleep (0.01)
   end
   
-  def set_linefeed_rate(rate) #def = 22
+  def set_linefeed_rate(rate) #def = 22?
     @sp.putc COMMAND 
     @sp.putc FEED_RATE 
     @sp.putc rate 

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/config_file'
@@ -28,14 +30,14 @@ def cleanHTML(text)
   newtext.gsub! "&\#8217;", "'"
   newtext.gsub! "&\#8230;", "..."
   newtext.gsub! "&\#176;", "\xF8"
-  newtext.gsub! "°", "\xF8" # °
-  newtext.gsub! "£", "\x9C" # £
+  #newtext.gsub! "°", "\xF8"  
+  #newtext.gsub! "£", "\x9C"  
   return newtext
 end 
 
 def printList(db, title, sql, narrow = false)
   @printer.set_double_print_on
-  @printer.print_text title
+  @printer.print_line title
   @printer.set_double_print_off
   @printer.set_character_width_narrow if (narrow)
   db.execute(sql) do |row|
@@ -52,20 +54,19 @@ def printList(db, title, sql, narrow = false)
         @printer.print areastring
         #@printer.set_double_print_off
         printtext = (row['title'])[0, ((narrow ? 64 : 48) - areastring.length)] #64 for narrow, 48 for wide font
-        @printer.print_text printtext
+        @printer.print_line printtext
   end
   @printer.set_character_width_normal if (narrow)
   @printer.print "\n"
 end
 
 def printDate
-  @printer.print_text Time.now.localtime.strftime("%A, %d %B %Y")
-  @printer.print "\n"
+  @printer.print_line Time.now.localtime.strftime("%A, %d %B %Y")
 end
 
 def printWeather (narrow = false)
   @printer.set_double_print_on
-  @printer.print_text "Weather - " + settings.weather['location']
+  @printer.print_line "Weather - " + settings.weather['location']
   @printer.set_double_print_off
   @printer.set_character_width_narrow if (narrow)
   
@@ -88,18 +89,18 @@ def printWeather (narrow = false)
     text.gsub!("\nHumidity","  Humidity")
     text.gsub!("\nPollution","  Pollution")
   end
-  @printer.print_text [cleanHTML(text)]
+  @printer.print_line cleanHTML(text)
 
   doc = Hpricot(open(settings.weather['page']).read) # remove 'http://www.bbc.co.uk/weather/2637487'
   @printer.set_double_print_on
-  @printer.print_text((doc/"//div[@class='title']")[0].innerHTML)
+  @printer.print_line((doc/"//div[@class='title']")[0].innerHTML)
   @printer.set_double_print_off
-  @printer.print_text((doc/"//div[@class='body']")[0].innerHTML)
+  @printer.print_line((doc/"//div[@class='body']")[0].innerHTML)
   @printer.set_double_print_on
   if ((doc/"//div[@class='title']")[1]) 
-    @printer.print_text((doc/"//div[@class='title']")[1].innerHTML)
+    @printer.print_line((doc/"//div[@class='title']")[1].innerHTML)
     @printer.set_double_print_off
-    @printer.print_text((doc/"//div[@class='body']")[1].innerHTML)
+    @printer.print_line((doc/"//div[@class='body']")[1].innerHTML)
   end
   
   #TODO: what happens when there are more than one forecast section? show both
@@ -143,7 +144,7 @@ end
 
 def printTrains(narrow = false)
   @printer.set_double_print_on
-  @printer.print_text "Trains"
+  @printer.print_line "Trains"
   @printer.set_double_print_off
 
   @printer.set_character_width_narrow if (narrow)
@@ -162,15 +163,15 @@ def printTrains(narrow = false)
         
     }
     if (status) 
-      @printer.print_text time + " - " + status
+      @printer.print_line time + " - " + status
     end
   }
   
   doc = Hpricot(open('http://www.journeycheck.southwesttrains.co.uk/southwesttrains/route?from=SOA&to=WAT&action=search').read)
-  @printer.print_text((doc/"#portletDivBodygeneralUpdatesLineUpdate"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_text((doc/"#portletDivBodygeneralUpdatesTrainCancellation"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_text((doc/"#portletDivBodygeneralUpdatesOtherTrainAlteration"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_text((doc/"#portletDivBodygeneralUpdatesToStationUndergroundUpdate"/"div/div")[1].innerHTML.strip.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").gsub(" but there are planned disruptions", "").split(".").shift)
+  @printer.print_line((doc/"#portletDivBodygeneralUpdatesLineUpdate"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line((doc/"#portletDivBodygeneralUpdatesTrainCancellation"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line((doc/"#portletDivBodygeneralUpdatesOtherTrainAlteration"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line((doc/"#portletDivBodygeneralUpdatesToStationUndergroundUpdate"/"div/div")[1].innerHTML.strip.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").gsub(" but there are planned disruptions", "").split(".").shift)
   @printer.print "\n"
   "done"
 
@@ -181,7 +182,7 @@ end
 
 def printCalendar(narrow = false) 
   @printer.set_double_print_on
-  @printer.print_text "Calendar"
+  @printer.print_line "Calendar"
   @printer.set_double_print_off
 
   @printer.set_character_width_narrow if (narrow)
@@ -211,10 +212,10 @@ def printCalendar(narrow = false)
 
   titles.each_with_index do |title, idx|
     line = (shortdate[idx] + " " + title)[0, (narrow ? 64 : 48)]
-    @printer.print_text line
+    @printer.print_line line
     if (location[idx].first) 
       line2 = ("            (" + location[idx].first.slice(13..-1) + ")")[0, (narrow ? 64 : 48)]
-      @printer.print_text line2
+      @printer.print_line line2
     end
   end
 
@@ -310,16 +311,16 @@ get '/print' do
   end
   rss = RSS::Parser.parse(rss_content, false)
   # useful: rss.items.size, rss.channel.description, ...
-  @printer.print_text ["#{rss.channel.title} (#{rss.channel.link})"]
+  @printer.print_line ["#{rss.channel.title} (#{rss.channel.link})"]
   @printer.set_font_weight_bold
-  @printer.print_text [cleanHTML(rss.items[0].title)]
+  @printer.print_line [cleanHTML(rss.items[0].title)]
   @printer.set_font_weight_normal
   @printer.set_character_width_narrow
-  @printer.print_text [cleanHTML(rss.items[0].description)]
+  @printer.print_line [cleanHTML(rss.items[0].description)]
   @printer.set_underline_on
-  @printer.print_text [rss.items[0].link]
+  @printer.print_line [rss.items[0].link]
   @printer.set_underline_off
-  @printer.print_text [rss.items[0].date.strftime("%B %d, %Y")]
+  @printer.print_line [rss.items[0].date.strftime("%B %d, %Y")]
   @printer.set_character_width_normal
   @printer.feed_and_cut
   "Printed first item from feed: #{@feed}"
