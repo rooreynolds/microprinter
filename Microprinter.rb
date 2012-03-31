@@ -238,10 +238,10 @@ class Microprinter
     data.each do |x|
       @sp.putc x 
       @sp.flush
-      sleep (0.005)
+      sleep (0.001)
     end
     @sp.flush
-    sleep (0.1)
+    sleep (0.01)
   end
 
 end 

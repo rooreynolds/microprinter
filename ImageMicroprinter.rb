@@ -7,7 +7,7 @@ class ImageMicroprinter < Microprinter
 
   # mode = 0: width = 288
   # mode = 1: width = 576
-  def print_image(image_path, dither = true, mode = 0)
+  def print_image(image_path, dither = true, mode = 0, border = 0)
     width = 288
     width = 576 if mode == 1 or mode == 21
 
@@ -37,6 +37,10 @@ class ImageMicroprinter < Microprinter
       image = bigger_canvas.composite(image, Magick::WestGravity, OverCompositeOp)
     end
   
+    if (border > 0) 
+      image = image.border(border,border,"black")
+    end
+
     #reduce to max width if it's larger
     if image.columns > width 
       puts "resizing"
@@ -55,6 +59,9 @@ class ImageMicroprinter < Microprinter
       image = image.quantize(2, Magick::GRAYColorspace, Magick::NoDitherMethod)
     end
 
+    rows = image.rows
+    cols = image.columns
+    puts "cols = #{cols} rows = #{rows}"
 
     rowlimit = 8
     rowlimit = 24 if mode > 1
