@@ -13,8 +13,9 @@ Contents
  - Microprinter_debug.rb - ruby class which prints to console rather than printer
  - ImageMicroprinter.rb - a subclass of Microprinter which can print images
  - microbroker-sinatra - sinatra app   
-   usage: `ruby -rubygems microprinter-sinatra.rb`  
-  `http://localhost:4567/print/weather`  
+   usage: `ruby microprinter-sinatra.rb`  
+  `http://localhost:4567/print/dailydump`  
+  `http://localhost:4567/print/weather`
   `http://localhost:4567/print?text=test text`  
   `http://localhost:4567/print?feed=http://rooreynolds.com/feed/`  
 
@@ -32,8 +33,6 @@ In no particular order, some things to be done:
 -   add code to manage `/print?url=http://url.com`  
 -   check RSS feeds and print new items as they appear  
     Examples: twitter, latest links on pinboard.in, latest instapaper items…
--   make URL for weather reports configurable so it's not hard coded to south of england (!)
--   create a config file for arduino port, RSS feeds, weather location
 -   re-integrate debug library into microprinter.rb - pipe serial messages to console for debugging and automated testing. 
 -   format the RSS feed item printout to shorten the URL and print properly so that it can be OCR'd with Google Goggles
 
