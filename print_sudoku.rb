@@ -54,7 +54,7 @@ def print_sudoku(puzzle)
 	@printer.print_line margin + btlft + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + btrgt  
 end
 
-# technique for generating sudokus borrowed from http://rubyquiz.strd6.com/quizzes/182-sudoku-generator
+# technique for generating seed sudoku borrowed from http://rubyquiz.strd6.com/quizzes/182-sudoku-generator
 puzzle = [0] * 81
 a = (1..9).sort_by{rand}  #generate a 'seed' with three boxes populated
 b = (1..9).sort_by{rand}
@@ -90,12 +90,64 @@ puzzle = puzzle.solve # now show the solved puzzle
 print_sudoku(puzzle)
 @printer.feed
 
-while(puzzle.solutions.count < 100) do  #poke enough holes to make it interesting
-  5.times{puzzle.set(rand(9),rand(9),nil)}
+i = 0
+solutions = 1
+filled = 81
+oldpuzzle = puzzle
+holes = Hash.new(false) # where have we previously made holes?
+
+n = 10 # how many to attempt to remove each pass
+
+candidates = Hash.new
+puzzle.glyph_state.each { |square, glyph| candidates[[square.x, square.y]] = glyph.to_s}
+
+# todo: vary difficulty by varying remaining squares theshold (puzzle.glyph_state.count below)
+while(puzzle.glyph_state.count > 28 && candidates.size > 0) do  # blank out enough squares to make it interesting, but give up if we can't remove any more
+	newholes = Hash.new(false)
+	n.times{
+		if (candidates.size > 0) # can't keep going if we run out of possible squares to blank
+	  	candidate = candidates.keys[rand(candidates.size)]
+	  	x = candidate[0]
+	  	y = candidate[1]
+	  	if (n == 1) # keep track of the available choices only when we start to struggle
+	  		candidates.delete(candidate)
+	  	end
+	  	puzzle.set(x,y,nil)
+	  	newholes[[x,y]] = true
+		end
+	}
+  solutions = puzzle.solutions.count
+  filled = puzzle.glyph_state.count
+  if (solutions > 1) # more than one solution. Not a valid sodoku. back out
+  	puts ("   " + i.to_s + "\t" + n.to_s + "\t" + solutions.to_s + "\t" + filled.to_s + "\t" + candidates.size.to_s + "\t" + holes.size.to_s)
+  	puzzle = oldpuzzle.clone
+  	if (n > 1) 
+  		n = n - 1
+  	end
+  else 
+  	holes = holes.merge(newholes)
+  	oldpuzzle = puzzle.clone # keep backup
+  	puts ("** " + i.to_s + "\t" + n.to_s + "\t" + solutions.to_s + "\t" + filled.to_s + "\t" + candidates.size.to_s + "\t" + holes.size.to_s + "\t(+" + newholes.length.to_s + ")")
+  end
+  i = i + 1
 end
+
 print_sudoku(puzzle.solve) # show it can still be solved
 @printer.feed_and_cut
 
 print_sudoku(puzzle) # show the incomplete puzzle
-puts puzzle.solutions.count.to_s + " possible solutions"
 @printer.feed_and_cut
+
+puts
+puts puzzle.solutions.count.to_s + " possible solutions"
+puts "took " + i.to_s + " iterations to make"
+puts "puzzle has " + filled.to_s + " clues"
+puts "puzzle has " + holes.size.to_s + " holes"
+
+# test difficulties: 
+#http://www.sudokuwiki.org/sudoku.htm
+#http://www.websudoku.com/?level=3
+#http://www.menneske.no/sudoku/eng/random.html?start=18&stop=18
+# tips:
+#http://www.sudokuoftheday.com/pages/techniques-overview.php
+#http://www.angusj.com/sudoku/hints.php
