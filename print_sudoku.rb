@@ -51,7 +51,19 @@ def print_sudoku(puzzle)
 	@printer.print_line margin + vertD + g[[7,0]] + vertc + g[[7,1]] + vertc + g[[7,2]] + vertD + g[[7,3]] + vertc + g[[7,4]] + vertc + g[[7,5]] + vertD + g[[7,6]] + vertc + g[[7,7]] + vertc + g[[7,8]] + vertD
 	@printer.print_line margin + lcros + horz3 + cross + horz3 + cross + horz3 + crsDV + horz3 + cross + horz3 + cross + horz3 + crsDV + horz3 + cross + horz3 + cross + horz3 + rcros  
 	@printer.print_line margin + vertD + g[[8,0]] + vertc + g[[8,1]] + vertc + g[[8,2]] + vertD + g[[8,3]] + vertc + g[[8,4]] + vertc + g[[8,5]] + vertD + g[[8,6]] + vertc + g[[8,7]] + vertc + g[[8,8]] + vertD
-	@printer.print_line margin + btlft + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + btrgt  
+	@printer.print_line margin + btlft + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + bcrsD + hrzD3 + bcros + hrzD3 + bcros + hrzD3 + btrgt
+
+	webstring = "http://www.sudokuwiki.org/sudoku.htm?bd="
+	for i in (0...9)
+		for j in (0...9)
+			glyph = g[[i, j]].strip
+			if (glyph == "")
+      			glyph = "."
+    		end
+    		webstring += glyph.to_s
+		end
+	end
+	return webstring
 end
 
 # technique for generating seed sudoku borrowed from http://rubyquiz.strd6.com/quizzes/182-sudoku-generator
@@ -102,7 +114,7 @@ candidates = Hash.new
 puzzle.glyph_state.each { |square, glyph| candidates[[square.x, square.y]] = glyph.to_s}
 
 # todo: vary difficulty by varying remaining squares theshold (puzzle.glyph_state.count below)
-while(puzzle.glyph_state.count > 28 && candidates.size > 0) do  # blank out enough squares to make it interesting, but give up if we can't remove any more
+while(puzzle.glyph_state.count > 30 && candidates.size > 0) do  # blank out enough squares to make it interesting, but give up if we can't remove any more
 	newholes = Hash.new(false)
 	n.times{
 		if (candidates.size > 0) # can't keep going if we run out of possible squares to blank
@@ -135,7 +147,7 @@ end
 print_sudoku(puzzle.solve) # show it can still be solved
 @printer.feed_and_cut
 
-print_sudoku(puzzle) # show the incomplete puzzle
+helpurl = print_sudoku(puzzle) # show the incomplete puzzle
 @printer.feed_and_cut
 
 puts
@@ -143,6 +155,7 @@ puts puzzle.solutions.count.to_s + " possible solutions"
 puts "took " + i.to_s + " iterations to make"
 puts "puzzle has " + filled.to_s + " clues"
 puts "puzzle has " + holes.size.to_s + " holes"
+puts "online help " + helpurl
 
 # test difficulties: 
 #http://www.sudokuwiki.org/sudoku.htm
