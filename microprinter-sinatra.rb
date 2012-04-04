@@ -209,8 +209,8 @@ def printCalendar(narrow = false)
   doc.elements.each('feed/entry/content'){ |e| content << e.text }
   doc.elements.each('feed/entry/content'){ |e| 
     whentokens = e.text.split("\n").first.split
-    p whentokens[7].slice(0..4)
-    shortdate << whentokens[5].strip + "-" + whentokens[7].strip.slice(0..4)
+                                      # NB: why isn't strip removing this final whitespace? forcing it with a slice
+    shortdate << whentokens[5].strip + "-" + whentokens[7].strip.slice(0..4) 
   }
   doc.elements.each('feed/entry/content'){ |e| location << e.text.split("\n").find_all {|i| i.include?("Where: ")}}
 
