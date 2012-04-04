@@ -31,8 +31,10 @@ def cleanHTML(text)
   newtext.gsub! "&\#8217;", "'"
   newtext.gsub! "&\#8230;", "..."
   newtext.gsub! "&\#176;", "\xF8"
-  #newtext.gsub! "°", "\xF8"  
-  #newtext.gsub! "£", "\x9C"  
+  newtext.gsub! "&\#163;", "\x9C" # £
+  newtext.gsub! "&pound;", "\x9C" # £
+  newtext.gsub! "&#xA3;", "\x9C" # £
+  newtext.gsub! "°", "\xF8"
   return newtext
 end 
 
