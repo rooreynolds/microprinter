@@ -11,6 +11,10 @@ class Microprinter_debug
   BARCODE_MODE_CODEABAR = 0x06
   BARCODE_MODE_CODE128 = 0x07
 
+  BARCODE_WIDTH_NARROW = 0x02
+  BARCODE_WIDTH_MEDIUM = 0x03
+  BARCODE_WIDTH_WIDE = 0x04
+
   def initialize(port_str = "")
     puts "[Microprinter init]" 
   end
