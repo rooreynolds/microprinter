@@ -14,6 +14,7 @@ config_file 'settings.yml'
 
 before do
   if (settings.debug)
+    require './Microprinter.rb' 
     require './Microprinter_debug.rb'
     @printer = Microprinter_debug.new(settings.arduinoport)
   else
@@ -70,7 +71,7 @@ def printWeather (narrow = false)
   @printer.set_double_print_off
   @printer.set_character_width_narrow if (narrow)
   
-  @feed = settings.weather['feed']  # remove "http://open.live.bbc.co.uk/weather/feeds/en/2637487/3dayforecast.rss"
+  @feed = settings.weather['feed']
   rss_content = ""
   open(@feed) do |f|
     rss_content = f.read
@@ -91,7 +92,7 @@ def printWeather (narrow = false)
   end
   @printer.print_line cleanHTML(text)
 
-  doc = Hpricot(open(settings.weather['page']).read) # remove 'http://www.bbc.co.uk/weather/2637487'
+  doc = Hpricot(open(settings.weather['page']).read) 
   @printer.set_double_print_on
   @printer.print_line((doc/"//div[@class='title']")[0].innerHTML)
   @printer.set_double_print_off
@@ -114,7 +115,7 @@ end
 def printThings(narrow = false)
   thingsdb = "/Users/" + `whoami`.strip + "/" + settings.thingssqlitedb
   p thingsdb
-  db = SQLite3::Database.new(thingsdb)  # TODO: remove "/Users/rooreynolds/Library/Application Support/Cultured Code/Things beta/ThingsLibrary.db"
+  db = SQLite3::Database.new(thingsdb)  
   db.results_as_hash = true
   printList(db, "Actions - Review", "select ZTHING.ZTITLE as title, " \
     "date(ZTHING.ZSTARTDATE, 'unixepoch', '+31 years', 'localtime') as startdate, " \
@@ -187,8 +188,7 @@ def printCalendar(narrow = false)
 
   @printer.set_character_width_narrow if (narrow)
   
-  url = settings.googlecalendar # TODO remove 'https://www.google.com/calendar/feeds/roo.reynolds%40digital.cabinet-office.gov.uk/private-ef8146bf0bee5149c2748a89078badc6/basic'
-  # get all future events, ordered by start time
+  url = settings.googlecalendar 
   url = url + "?singleevents=true&orderby=starttime&sortorder=ascending"
   # actually, just get today's events
   today = Date.today.strftime('%Y-%m-%dT%H:%M:%S')
@@ -207,7 +207,11 @@ def printCalendar(narrow = false)
   location = []
   doc.elements.each('feed/entry/title'){ |e| titles << e.text }
   doc.elements.each('feed/entry/content'){ |e| content << e.text }
-  doc.elements.each('feed/entry/content'){ |e| shortdate << e.text.split("\n").first.slice(22..35).gsub(" to ", "-")}
+  doc.elements.each('feed/entry/content'){ |e| 
+    whentokens = e.text.split("\n").first.split
+    p whentokens[7].slice(0..4)
+    shortdate << whentokens[5].strip + "-" + whentokens[7].strip.slice(0..4)
+  }
   doc.elements.each('feed/entry/content'){ |e| location << e.text.split("\n").find_all {|i| i.include?("Where: ")}}
 
   titles.each_with_index do |title, idx|
@@ -227,15 +231,6 @@ get '/print/cut' do
   @printer.cut
   "cut"
 end 
-
-get '/print/barcode' do
-  @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
-  @printer.set_barcode_height(45)
-  @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
-  @printer.print_barcode("/2009/02/22/")
-  @printer.feed_and_cut
-  "Printed sample barcode"
-end
 
 get '/print/barcode/:barcode' do
   @printer.set_barcode_height(params[:height]) if params[:height] 
@@ -268,6 +263,15 @@ get '/print/barcode/:barcode' do
   end
   @printer.feed_and_cut
   "Printed barcode #{params[:barcode]}"
+end
+
+get '/print/barcode' do
+  @printer.set_barcode_width(Microprinter::BARCODE_WIDTH_MEDIUM)
+  @printer.set_barcode_height(45)
+  @printer.set_barcode_text_position(Microprinter::BARCODE_TEXT_BELOW)
+  @printer.print_barcode("/2009/02/22/")
+  @printer.feed_and_cut
+  "Printed sample barcode"
 end
 
 get '/print' do
