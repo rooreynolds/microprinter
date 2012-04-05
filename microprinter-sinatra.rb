@@ -197,8 +197,10 @@ def printCalendar(narrow = false)
   tomorrow = (Date.today+1).strftime('%Y-%m-%dT%H:%M:%S')
   url = url + '&start-min=' + today
   url = url + '&start-max=' + tomorrow
+  puts url 
 
   xml_data = ""
+  
   open(url) do |f|
     xml_data = f.read
   end
@@ -211,8 +213,13 @@ def printCalendar(narrow = false)
   doc.elements.each('feed/entry/content'){ |e| content << e.text }
   doc.elements.each('feed/entry/content'){ |e| 
     whentokens = e.text.split("\n").first.split
-                                      # NB: why isn't strip removing this final whitespace? forcing it with a slice
-    shortdate << whentokens[5].strip + "-" + whentokens[7].strip.slice(0..4) 
+    if whentokens[5] == "/>" # this happens when it's an all day event
+      # TODO: this is grim. Use JSON/iCal instead and refactor?
+      shortdate << "All day ---"
+    else
+      shortdate << whentokens[5] + "-" + whentokens[7].to_s.slice(0..4) 
+      # NB: urgh. Why isn't strip removing this final whitespace? Forcing it with a slice of ignorance
+    end                                          
   }
   doc.elements.each('feed/entry/content'){ |e| location << e.text.split("\n").find_all {|i| i.include?("Where: ")}}
 
