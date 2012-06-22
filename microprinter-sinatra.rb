@@ -94,24 +94,20 @@ def printWeather (narrow = false)
   end
   @printer.print_line cleanHTML(text)
 
-  doc = Hpricot(open(settings.weather['page']).read) 
+  doc = Hpricot(open(settings.weather['page']).read)
   @printer.set_double_print_on
-  @printer.print_line((doc/"//div[@class='title']")[0].innerHTML)
+  @printer.print_line((doc/"//h4[@class='title']")[0].innerHTML)
   @printer.set_double_print_off
-  @printer.print_line((doc/"//div[@class='body']")[0].innerHTML)
+  @printer.print_line((doc/"//p[@class='body']")[0].innerHTML)
   @printer.set_double_print_on
-  if ((doc/"//div[@class='title']")[1]) 
-    @printer.print_line((doc/"//div[@class='title']")[1].innerHTML)
+  if ((doc/"//h4[@class='title']")[1])
+    @printer.print_line((doc/"//h4[@class='title']")[1].innerHTML)
     @printer.set_double_print_off
-    @printer.print_line((doc/"//div[@class='body']")[1].innerHTML)
+    @printer.print_line((doc/"//p[@class='body']")[1].innerHTML)
   end
-  
-  #TODO: what happens when there are more than one forecast section? show both
-
-  #TODO: temp and summary of NOW via now-summary and temperature-value-unit-c http://www.bbc.co.uk/weather/2637487/location-now-weather/
   @printer.set_character_width_normal if (narrow)
-  "Printed the weather"
   @printer.print "\n"
+  "Printed the weather"
 end
 
 def printThings(narrow = false)
