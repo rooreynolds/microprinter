@@ -30,11 +30,12 @@ def cleanHTML(text)
   newtext.gsub! "&\#8216;", "'" # replace curly quotes
   newtext.gsub! "&\#8217;", "'"
   newtext.gsub! "&\#8230;", "..."
+  #newtext.gsub! "°", "\xF8"
   newtext.gsub! "&\#176;", "\xF8"
+  newtext.gsub! "&nbsp;", " " # &nbsp;
   newtext.gsub! "&\#163;", "\x9C" # £
   newtext.gsub! "&pound;", "\x9C" # £
   newtext.gsub! "&#xA3;", "\x9C" # £
-  newtext.gsub! "°", "\xF8"
   return newtext
 end 
 
@@ -167,10 +168,10 @@ def printTrains(narrow = false)
   }
   
   doc = Hpricot(open('http://www.journeycheck.southwesttrains.co.uk/southwesttrains/route?from=SOA&to=WAT&action=search').read)
-  @printer.print_line((doc/"#portletDivBodygeneralUpdatesLineUpdate"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_line((doc/"#portletDivBodygeneralUpdatesTrainCancellation"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_line((doc/"#portletDivBodygeneralUpdatesOtherTrainAlteration"/"div/div").first.innerHTML.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
-  @printer.print_line((doc/"#portletDivBodygeneralUpdatesToStationUndergroundUpdate"/"div/div")[1].innerHTML.strip.gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").gsub(" but there are planned disruptions", "").split(".").shift)
+  @printer.print_line(cleanHTML((doc/"#portletDivBodygeneralUpdatesLineUpdate"/"div/div").first.innerHTML).gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line(cleanHTML((doc/"#portletDivBodygeneralUpdatesTrainCancellation"/"div/div").first.innerHTML).gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line(cleanHTML((doc/"#portletDivBodygeneralUpdatesOtherTrainAlteration"/"div/div").first.innerHTML).gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").strip)
+  @printer.print_line(cleanHTML((doc/"#portletDivBodygeneralUpdatesToStationUndergroundUpdate"/"div/div")[1].innerHTML.strip).gsub(/<script.*?>[\s\S]*<\/script>/i, "").gsub(/<[^>]*>/ui,'').gsub(/\s+/, " ").gsub(" but there are planned disruptions", "").split(".").shift)
   @printer.print "\n"
   "done"
 
