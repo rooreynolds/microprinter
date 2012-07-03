@@ -226,10 +226,10 @@ def printCalendar(narrow = false)
 
   titles.each_with_index do |title, idx|
     line = (shortdate[idx] + " " + title)[0, (narrow ? 64 : 48)]
-    @printer.print_line line
-    if (location[idx].first) 
+    @printer.print_line cleanHTML(line)
+    if (location[idx].first)
       line2 = ("            (" + location[idx].first.slice(13..-1) + ")")[0, (narrow ? 64 : 48)]
-      @printer.print_line line2
+      @printer.print_line cleanHTML(line2)
     end
   end
 
